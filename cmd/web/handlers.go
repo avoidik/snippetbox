@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 )
 
@@ -46,4 +48,14 @@ func ShowSnippet(w http.ResponseWriter, r *http.Request) {
 
 func NewSnippet(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("NewSnippet"))
+}
+
+func VersionInfo(w http.ResponseWriter, r *http.Request) {
+	verFile := filepath.Join(".", "VERSION")
+	if _, err := os.Stat(verFile); err != nil {
+		w.WriteHeader(404)
+		w.Write([]byte("Version was not found"))
+		return
+	}
+	http.ServeFile(w, r, verFile)
 }
