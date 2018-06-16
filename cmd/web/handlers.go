@@ -10,15 +10,15 @@ import (
 	"strconv"
 )
 
-func Home(w http.ResponseWriter, r *http.Request) {
+func (app *App) Home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
 		return
 	}
 
 	files := []string{
-		"./ui/html/base.html",
-		"./ui/html/home.page.html",
+		filepath.Join(app.htmlDir, "base.html"),
+		filepath.Join(app.htmlDir, "home.page.html"),
 	}
 
 	ts, err := template.ParseFiles(files...)
@@ -36,7 +36,7 @@ func Home(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ShowSnippet(w http.ResponseWriter, r *http.Request) {
+func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 	queryID := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(queryID)
 	if err != nil || id < 1 {
@@ -46,12 +46,12 @@ func ShowSnippet(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "ShowSnippet with %d id\n", id)
 }
 
-func NewSnippet(w http.ResponseWriter, r *http.Request) {
+func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("NewSnippet"))
 }
 
-func VersionInfo(w http.ResponseWriter, r *http.Request) {
-	verFile := filepath.Join(".", "VERSION")
+func (app *App) VersionInfo(w http.ResponseWriter, r *http.Request) {
+	verFile := filepath.Join(app.staticDir, "VERSION")
 	if _, err := os.Stat(verFile); err != nil {
 		w.WriteHeader(404)
 		w.Write([]byte("Version was not found"))
