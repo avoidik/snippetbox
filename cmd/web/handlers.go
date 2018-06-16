@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
@@ -13,7 +15,13 @@ func Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func ShowSnippet(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("ShowSnippet"))
+	queryID := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(queryID)
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+	fmt.Fprintf(w, "ShowSnippet with %d id\n", id)
 }
 
 func NewSnippet(w http.ResponseWriter, r *http.Request) {
