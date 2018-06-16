@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
+	log.Println("Starting the server...")
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", Home)
 	mux.HandleFunc("/snippet", ShowSnippet)

@@ -1,0 +1,26 @@
+{{define "base" -}}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{{template "page-title" .}} - Snippetbox</title>
+    </head>
+    <body>
+        <header>
+            <h1><a href="/">Snippetbox</a></h1>
+        </header>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/snippet/new">New Snippet</a>
+        </nav>
+        <section>
+            {{- template "page-body" .}}
+        </section>
+        <footer>
+            {{- block "page-footer" .}}
+            Feel free to create one
+            {{end}}
+        </footer>
+    </body>
+</html>
+{{- end}}
