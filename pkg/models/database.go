@@ -53,3 +53,20 @@ func (db *Database) LatestSnippets() (Snippets, error) {
 
 	return snippets, nil
 }
+
+func (db *Database) InsertSnippet(title, content, expires string) (int, error) {
+	stmt := `INSERT INTO snippets (title, content, created, expires)
+	VALUES (?, ?, datetime('now'), datetime('now', ?))`
+
+	result, err := db.Exec(stmt, title, content, expires)
+	if err != nil {
+		return 0, err
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(id), nil
+}

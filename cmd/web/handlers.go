@@ -57,7 +57,19 @@ func (app *App) LatestSnippets(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("NewSnippet"))
+	switch r.Method {
+	case http.MethodGet:
+		w.Write([]byte("NewSnippet"))
+	case http.MethodPost:
+		id, err := app.database.InsertSnippet("test", "test", "+2 days")
+		if err != nil {
+			app.ServerError(w, err)
+			return
+		}
+		fmt.Fprintf(w, "New item id = %d\n", id)
+	default:
+		w.Write([]byte("Not Implemented"))
+	}
 }
 
 func (app *App) VersionInfo(w http.ResponseWriter, r *http.Request) {
