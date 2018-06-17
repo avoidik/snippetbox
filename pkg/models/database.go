@@ -20,5 +20,20 @@ func (db *Database) GetSnippet(id int) (*Snippet, error) {
 		}
 		return snippet, nil
 	}
-	return nil, nil
+
+	stmt := `SELECT id, title, content, created, expires FROM snippets
+	WHERE id = ? AND expires > datetime('now')`
+
+	row := db.QueryRow(stmt, id)
+
+	s := &Snippet{}
+
+	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }
