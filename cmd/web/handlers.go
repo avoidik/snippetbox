@@ -39,6 +39,23 @@ func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, snippet)
 }
 
+func (app *App) LatestSnippets(w http.ResponseWriter, r *http.Request) {
+	snippets, err := app.database.LatestSnippets()
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	if snippets == nil {
+		app.NotFound(w)
+		return
+	}
+
+	for _, s := range snippets {
+		fmt.Fprint(w, s)
+	}
+}
+
 func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("NewSnippet"))
 }

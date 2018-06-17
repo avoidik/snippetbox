@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"time"
 )
 
 type Database struct {
@@ -10,17 +9,6 @@ type Database struct {
 }
 
 func (db *Database) GetSnippet(id int) (*Snippet, error) {
-	if id == 123 {
-		snippet := &Snippet{
-			ID:      id,
-			Title:   "Example Title",
-			Content: "Example Content",
-			Created: time.Now(),
-			Expires: time.Now(),
-		}
-		return snippet, nil
-	}
-
 	stmt := `SELECT id, title, content, created, expires FROM snippets
 	WHERE id = ? AND expires > datetime('now')`
 
@@ -36,4 +24,32 @@ func (db *Database) GetSnippet(id int) (*Snippet, error) {
 	}
 
 	return s, nil
+}
+
+func (db *Database) LatestSnippets() (Snippets, error) {
+	stmt := `SELECT id, title, content, created, expires FROM snippets
+	WHERE expires > datetime('now') ORDER BY created DESC LIMIT 10`
+
+	rows, err := db.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	snippets := Snippets{}
+
+	for rows.Next() {
+		s := &Snippet{}
+		err := rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+		if err != nil {
+			return nil, err
+		}
+		snippets = append(snippets, s)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return snippets, nil
 }

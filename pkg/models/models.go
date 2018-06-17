@@ -12,4 +12,4 @@ type Snippet struct {
 	Expires time.Time
 }
 
-type Snippets *[]Snippet
+type Snippets []*Snippet
