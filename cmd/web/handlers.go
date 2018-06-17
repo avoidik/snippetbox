@@ -24,7 +24,19 @@ func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	fmt.Fprintf(w, "ShowSnippet with %d id\n", id)
+
+	snippet, err := app.database.GetSnippet(id)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	if snippet == nil {
+		app.NotFound(w)
+		return
+	}
+
+	fmt.Fprint(w, snippet)
 }
 
 func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
