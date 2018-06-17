@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -16,24 +14,7 @@ func (app *App) Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		filepath.Join(app.htmlDir, "base.html"),
-		filepath.Join(app.htmlDir, "home.page.html"),
-	}
-
-	ts, err := template.ParseFiles(files...)
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
-		return
-	}
-
-	err = ts.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		log.Println(err.Error())
-		http.Error(w, "Internal Server Error", 500)
-		return
-	}
+	app.RenderHtml(w, "home.page.html")
 }
 
 func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
