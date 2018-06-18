@@ -4,12 +4,18 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"snippetbox.org/pkg/models"
 )
 
 type HtmlData struct {
-	Snippet *models.Snippet
+	Snippet  *models.Snippet
+	Snippets []*models.Snippet
+}
+
+func humanDate(t time.Time) string {
+	return t.Format(time.Stamp)
 }
 
 func (app *App) RenderHtml(w http.ResponseWriter, page string, data *HtmlData) {
@@ -18,7 +24,11 @@ func (app *App) RenderHtml(w http.ResponseWriter, page string, data *HtmlData) {
 		filepath.Join(app.htmlDir, page),
 	}
 
-	ts, err := template.ParseFiles(files...)
+	fn := template.FuncMap{
+		"humanDate": humanDate,
+	}
+
+	ts, err := template.New("").Funcs(fn).ParseFiles(files...)
 	if err != nil {
 		app.ServerError(w, err)
 		return
