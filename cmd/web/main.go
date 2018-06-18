@@ -39,10 +39,6 @@ func main() {
 		log.Fatal("Folder for html-dir was not found")
 	}
 
-	if !existDir(app.databaseFile) {
-		log.Fatal("File for db-file was not found")
-	}
-
 	if err := app.connectDb(); err != nil {
 		log.Fatal("Failed to establish database connection")
 	}
@@ -76,16 +72,33 @@ func main() {
 }
 
 func (app *App) connectDb() error {
-	dsn := fmt.Sprintf("file:%s?cache=shared&_loc=auto&mode=rw", app.databaseFile)
+	initDb := !existDir(app.databaseFile)
+
+	dsn := fmt.Sprintf("file:%s?cache=shared&_loc=auto", app.databaseFile)
 	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return err
 	}
+
+	defer func() {
+		if err != nil {
+			db.Close()
+		}
+	}()
+
 	if err = db.Ping(); err != nil {
-		db.Close()
 		return err
 	}
+
 	app.database = &models.Database{DB: db}
+
+	if initDb {
+		log.Println("Initializing database...")
+		if err := app.database.InitializeDb(); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

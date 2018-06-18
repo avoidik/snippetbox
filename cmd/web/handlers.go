@@ -68,15 +68,14 @@ func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Fprintf(w, "New item id = %d\n", id)
 	default:
-		w.Write([]byte("Not Implemented"))
+		app.ClientError(w, http.StatusNotImplemented)
 	}
 }
 
 func (app *App) VersionInfo(w http.ResponseWriter, r *http.Request) {
 	verFile := filepath.Join(app.staticDir, "VERSION")
 	if _, err := os.Stat(verFile); err != nil {
-		w.WriteHeader(404)
-		w.Write([]byte("Version was not found"))
+		http.Error(w, "Version was not found", 404)
 		return
 	}
 	http.ServeFile(w, r, verFile)

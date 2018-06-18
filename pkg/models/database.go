@@ -70,3 +70,53 @@ func (db *Database) InsertSnippet(title, content, expires string) (int, error) {
 
 	return int(id), nil
 }
+
+func (db *Database) InitializeDb() error {
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+
+	stmt := `
+	CREATE TABLE snippets (
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		title VARCHAR(255) NOT NULL,
+		content TEXT NOT NULL,
+		created DATETIME NOT NULL,
+		expires DATETIME NOT NULL
+	);
+	  
+	CREATE INDEX idx_snippets_created ON snippets(created);	
+	`
+
+	_, err = tx.Exec(stmt)
+	if err != nil {
+		return err
+	}
+
+	stmt = `INSERT INTO snippets (title, content, created, expires)
+	VALUES (?, ?, datetime('now'), datetime('now', ?))`
+
+	hokku := map[int][]interface{}{
+		0: {"An old silent pond", "An old silent pond...\nA frog jumps into the pond.\nSplash! Silence again.\n", "+14 days"},
+		1: {"Over the wintry forrest", "Over the wintry\nforest, winds howl in rage\nwith no leaves to blow.\n", "+14 days"},
+		2: {"First autumn morning", "First autumn morning\nthe mirror I stare into\nshows my father''s face.\n", "+14 days"},
+	}
+
+	for _, v := range hokku {
+		_, err = tx.Exec(stmt, v...)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
