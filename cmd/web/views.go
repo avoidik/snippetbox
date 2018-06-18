@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -34,9 +35,13 @@ func (app *App) RenderHtml(w http.ResponseWriter, page string, data *HtmlData) {
 		return
 	}
 
-	err = ts.ExecuteTemplate(w, "base", data)
+	buf := new(bytes.Buffer)
+
+	err = ts.ExecuteTemplate(buf, "base", data)
 	if err != nil {
 		app.ServerError(w, err)
 		return
 	}
+
+	buf.WriteTo(w)
 }
