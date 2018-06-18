@@ -14,7 +14,7 @@ func (app *App) Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.RenderHtml(w, "home.page.html")
+	app.RenderHtml(w, "home.page.html", nil)
 }
 
 func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +36,7 @@ func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprint(w, snippet)
+	app.RenderHtml(w, "show.page.html", &HtmlData{Snippet: snippet})
 }
 
 func (app *App) LatestSnippets(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +52,7 @@ func (app *App) LatestSnippets(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, s := range snippets {
-		fmt.Fprint(w, s)
+		app.RenderHtml(w, "show.page.html", &HtmlData{Snippet: s})
 	}
 }
 
@@ -75,7 +75,7 @@ func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
 func (app *App) VersionInfo(w http.ResponseWriter, r *http.Request) {
 	verFile := filepath.Join(app.staticDir, "VERSION")
 	if _, err := os.Stat(verFile); err != nil {
-		http.Error(w, "Version was not found", 404)
+		http.Error(w, "Version was not found", http.StatusNotFound)
 		return
 	}
 	http.ServeFile(w, r, verFile)
