@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 	"snippetbox.org/pkg/models"
@@ -48,8 +49,11 @@ func main() {
 	}()
 
 	server := &http.Server{
-		Addr:    app.addr,
-		Handler: app.Routes(),
+		Addr:         app.addr,
+		Handler:      app.Routes(),
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 
 	c := make(chan os.Signal, 1)
@@ -57,7 +61,12 @@ func main() {
 	go func() {
 		for sig := range c {
 			log.Printf("Terminating (signal caught - %s)\n", sig)
-			server.Shutdown(context.Background())
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer func() {
+				log.Println("Closing context")
+				cancel()
+			}()
+			server.Shutdown(ctx)
 		}
 	}()
 
