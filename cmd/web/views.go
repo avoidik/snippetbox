@@ -11,6 +11,7 @@ import (
 )
 
 type HtmlData struct {
+	Path     string
 	Snippet  *models.Snippet
 	Snippets []*models.Snippet
 }
@@ -19,7 +20,13 @@ func humanDate(t time.Time) string {
 	return t.Format(time.Stamp)
 }
 
-func (app *App) RenderHtml(w http.ResponseWriter, page string, data *HtmlData) {
+func (app *App) RenderHtml(w http.ResponseWriter, r *http.Request, page string, data *HtmlData) {
+	if data == nil {
+		data = &HtmlData{}
+	}
+
+	data.Path = r.URL.Path
+
 	files := []string{
 		filepath.Join(app.htmlDir, "base.html"),
 		filepath.Join(app.htmlDir, page),

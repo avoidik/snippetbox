@@ -20,7 +20,7 @@ func (app *App) Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.RenderHtml(w, "home.page.html", &HtmlData{Snippets: snippets})
+	app.RenderHtml(w, r, "home.page.html", &HtmlData{Snippets: snippets})
 }
 
 func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +42,7 @@ func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.RenderHtml(w, "show.page.html", &HtmlData{Snippet: snippet})
+	app.RenderHtml(w, r, "show.page.html", &HtmlData{Snippet: snippet})
 }
 
 func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
