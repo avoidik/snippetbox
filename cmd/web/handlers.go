@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -9,11 +8,6 @@ import (
 )
 
 func (app *App) Home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-
 	snippets, err := app.database.LatestSnippets()
 	if err != nil {
 		app.ServerError(w, err)
@@ -24,7 +18,7 @@ func (app *App) Home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
-	queryID := r.URL.Query().Get("id")
+	queryID := r.URL.Query().Get(":id")
 	id, err := strconv.Atoi(queryID)
 	if err != nil || id < 1 {
 		http.NotFound(w, r)
@@ -46,19 +40,11 @@ func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		w.Write([]byte("NewSnippet"))
-	case http.MethodPost:
-		id, err := app.database.InsertSnippet("test", "test", "+2 days")
-		if err != nil {
-			app.ServerError(w, err)
-			return
-		}
-		fmt.Fprintf(w, "New item id = %d\n", id)
-	default:
-		app.ClientError(w, http.StatusNotImplemented)
-	}
+	w.Write([]byte("NewSnippet"))
+}
+
+func (app *App) CreateSnippet(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("CreateSnippet"))
 }
 
 func (app *App) VersionInfo(w http.ResponseWriter, r *http.Request) {
