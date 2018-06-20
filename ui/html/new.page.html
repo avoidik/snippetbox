@@ -1,0 +1,27 @@
+{{define "page-title"}}Add new snippet{{end}}
+
+{{define "page-body"}}
+<form action="/snippet/new" method="POST">
+    <div>
+        <label>Title:</label>
+        <input type="text" name="title">
+    </div>
+    <div>
+        <label>Content:</label>
+        <textarea name="content"></textarea>
+    </div>
+    <div>
+        <label>Delete in:</label>
+        <input type="radio" name="expires" value="1209600" checked> Two weeks
+        <input type="radio" name="expires" value="604800"> One week
+        <input type="radio" name="expires" value="86400"> One day
+    </div>
+    <div>
+        <input type="submit" value="Publish">
+    </div>
+</form>
+{{- end}}
+
+{{define "page-footer"}}
+Create the masterpiece!
+{{- end}}

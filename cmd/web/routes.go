@@ -15,7 +15,7 @@ func (app *App) Routes() http.Handler {
 	mux.Get("/snippet/:id", http.HandlerFunc(app.ShowSnippet))
 
 	fileServer := http.FileServer(http.Dir(app.staticDir))
-	mux.Get("/static/", http.StripPrefix("/static", fileServer))
+	mux.Get("/static/", http.StripPrefix("/static", DisableIndex(fileServer)))
 
 	mux.Get("/version", http.HandlerFunc(app.VersionInfo))
 	return mux

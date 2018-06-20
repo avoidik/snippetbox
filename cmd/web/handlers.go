@@ -1,10 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
+
+	"snippetbox.org/pkg/forms"
 )
 
 func (app *App) Home(w http.ResponseWriter, r *http.Request) {
@@ -40,11 +44,36 @@ func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("NewSnippet"))
+	app.RenderHtml(w, r, "new.page.html", nil)
 }
 
 func (app *App) CreateSnippet(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("CreateSnippet"))
+	err := r.ParseForm()
+	if err != nil {
+		app.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := &forms.NewSnippet{
+		Title:   r.PostForm.Get("title"),
+		Content: r.PostForm.Get("content"),
+		Expires: r.PostForm.Get("expires"),
+	}
+
+	if !form.Valid() {
+		fmt.Fprint(w, form.Failures)
+		return
+	}
+
+	formatDate := fmt.Sprintf("+%s.0 seconds", form.Expires)
+
+	id, err := app.database.InsertSnippet(form.Title, form.Content, formatDate)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 }
 
 func (app *App) VersionInfo(w http.ResponseWriter, r *http.Request) {
@@ -54,4 +83,14 @@ func (app *App) VersionInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.ServeFile(w, r, verFile)
+}
+
+func DisableIndex(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/") {
+			http.Error(w, "Nothing to see here", http.StatusNotFound)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
