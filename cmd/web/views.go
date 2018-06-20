@@ -11,6 +11,7 @@ import (
 )
 
 type HtmlData struct {
+	Form     interface{}
 	Path     string
 	Snippet  *models.Snippet
 	Snippets []*models.Snippet

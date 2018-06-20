@@ -2,23 +2,35 @@
 
 {{define "page-body"}}
 <form action="/snippet/new" method="POST">
+    {{with .Form}}
     <div>
         <label>Title:</label>
-        <input type="text" name="title">
+        {{with .Failures.Title}}
+            <label class="error">{{.}}</label>
+        {{end}}
+        <input type="text" name="title" value="{{.Title}}">
     </div>
     <div>
         <label>Content:</label>
-        <textarea name="content"></textarea>
+        {{with .Failures.Content}}
+            <label class="error">{{.}}</label>
+        {{end}}
+        <textarea name="content">{{.Content}}</textarea>
     </div>
     <div>
         <label>Delete in:</label>
-        <input type="radio" name="expires" value="1209600" checked> Two weeks
-        <input type="radio" name="expires" value="604800"> One week
-        <input type="radio" name="expires" value="86400"> One day
+        {{with .Failures.Expires}}
+            <label class="error">{{.}}</label>
+        {{end}}
+        {{$expires := or .Expires "86400"}}
+        <input type="radio" name="expires" value="1209600" {{if eq $expires "1209600"}}checked{{end}}> Two weeks
+        <input type="radio" name="expires" value="604800" {{if eq $expires "604800"}}checked{{end}}> One week
+        <input type="radio" name="expires" value="86400" {{if eq $expires "86400"}}checked{{end}}> One day
     </div>
     <div>
         <input type="submit" value="Publish">
     </div>
+    {{end}}
 </form>
 {{- end}}
 

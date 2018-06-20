@@ -44,7 +44,9 @@ func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
-	app.RenderHtml(w, r, "new.page.html", nil)
+	app.RenderHtml(w, r, "new.page.html", &HtmlData{
+		Form: &forms.NewSnippet{},
+	})
 }
 
 func (app *App) CreateSnippet(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +63,7 @@ func (app *App) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !form.Valid() {
-		fmt.Fprint(w, form.Failures)
+		app.RenderHtml(w, r, "new.page.html", &HtmlData{Form: form})
 		return
 	}
 
