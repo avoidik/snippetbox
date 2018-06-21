@@ -18,5 +18,5 @@ func (app *App) Routes() http.Handler {
 	mux.Get("/static/", http.StripPrefix("/static", DisableIndex(fileServer)))
 
 	mux.Get("/version", http.HandlerFunc(app.VersionInfo))
-	return mux
+	return LogRequest(mux)
 }

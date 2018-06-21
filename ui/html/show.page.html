@@ -15,6 +15,11 @@
             <time>{{.Created | humanDate | printf "Created: %s"}}</time>
             <time>{{.Expires | humanDate | printf "Expires: %s"}}</time>
         </div>
+        <div class="metadata">
+            <form action="/snippet/{{.ID}}" method="post">
+                <input type="submit" value="Delete" name="delete">
+            </form>
+        </div>
     </div>
     {{else}}
     No snippets to display!
