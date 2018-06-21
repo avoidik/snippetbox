@@ -14,6 +14,7 @@ type HtmlData struct {
 	Form     interface{}
 	Path     string
 	Flash    string
+	LoggedIn bool
 	Snippet  *models.Snippet
 	Snippets []*models.Snippet
 }
@@ -28,6 +29,13 @@ func (app *App) RenderHtml(w http.ResponseWriter, r *http.Request, page string, 
 	}
 
 	data.Path = r.URL.Path
+
+	var err error
+	data.LoggedIn, err = app.LoggedIn(r)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
 
 	files := []string{
 		filepath.Join(app.htmlDir, "base.html"),
