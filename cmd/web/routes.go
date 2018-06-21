@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/bmizerany/pat"
+	"github.com/justinas/alice"
 )
 
 func (app *App) Routes() http.Handler {
@@ -18,5 +19,8 @@ func (app *App) Routes() http.Handler {
 	mux.Get("/static/", http.StripPrefix("/static", DisableIndex(fileServer)))
 
 	mux.Get("/version", http.HandlerFunc(app.VersionInfo))
-	return LogRequest(mux)
+
+	chain := alice.New(LogRequest, SecureHeaders).Then(mux)
+
+	return chain
 }
