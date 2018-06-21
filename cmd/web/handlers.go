@@ -113,3 +113,23 @@ func DisableIndex(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
+func (app *App) SignupUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "SignupUser")
+}
+
+func (app *App) CreateUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "CreateUser")
+}
+
+func (app *App) LoginUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "LoginUser")
+}
+
+func (app *App) VerifyUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "VerifyUser")
+}
+
+func (app *App) LogoutUser(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "LogoutUser")
+}

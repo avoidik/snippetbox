@@ -94,7 +94,15 @@ func (db *Database) InitializeDb() error {
 		expires DATETIME NOT NULL
 	);
 	  
-	CREATE INDEX idx_snippets_created ON snippets(created);	
+	CREATE INDEX idx_snippets_created ON snippets(created);
+
+	CREATE TABLE users (
+		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+		name VARCHAR(255) NOT NULL,
+		email VARCHAR(255) NOT NULL UNIQUE,
+		password CHAR(60) NOT NULL,
+		created DATETIME NOT NULL
+	);
 	`
 
 	_, err = tx.Exec(stmt)

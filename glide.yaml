@@ -1,0 +1,11 @@
+package: snippetbox.org
+import:
+- package: github.com/alexedwards/scs
+  version: v1.3.0
+- package: github.com/bmizerany/pat
+- package: github.com/justinas/alice
+- package: github.com/mattn/go-sqlite3
+  version: v1.9.0
+- package: golang.org/x/crypto
+  subpackages:
+  - bcrypt
