@@ -115,11 +115,30 @@ func DisableIndex(next http.Handler) http.Handler {
 }
 
 func (app *App) SignupUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "SignupUser")
+	app.RenderHtml(w, r, "signup.page.html", &HtmlData{
+		Form: &forms.SignupUser{},
+	})
 }
 
 func (app *App) CreateUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "CreateUser")
+	err := r.ParseForm()
+	if err != nil {
+		app.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := &forms.SignupUser{
+		Name:     r.PostForm.Get("name"),
+		Email:    r.PostForm.Get("email"),
+		Password: r.PostForm.Get("password"),
+	}
+
+	if !form.Valid() {
+		app.RenderHtml(w, r, "signup.page.html", &HtmlData{Form: form})
+		return
+	}
+
+	fmt.Fprintf(w, "CreateUser")
 }
 
 func (app *App) LoginUser(w http.ResponseWriter, r *http.Request) {

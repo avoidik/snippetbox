@@ -1,13 +1,24 @@
 package forms
 
 import (
+	"regexp"
 	"strings"
+	"unicode/utf8"
 )
+
+var rxEmail = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 
 type NewSnippet struct {
 	Title    string
 	Content  string
 	Expires  string
+	Failures map[string]string
+}
+
+type SignupUser struct {
+	Name     string
+	Email    string
+	Password string
 	Failures map[string]string
 }
 
@@ -32,4 +43,28 @@ func (ns *NewSnippet) Valid() bool {
 	}
 
 	return len(ns.Failures) == 0
+}
+
+func (su *SignupUser) Valid() bool {
+	su.Failures = make(map[string]string)
+
+	if len(strings.TrimSpace(su.Name)) == 0 {
+		su.Failures["Name"] = "Name is required"
+	} else if len(strings.TrimSpace(su.Name)) > 50 || len(strings.TrimSpace(su.Name)) < 3 {
+		su.Failures["Name"] = "Name cannot be longer than 50 and shorter than 3 characters"
+	}
+
+	if len(strings.TrimSpace(su.Email)) == 0 {
+		su.Failures["Email"] = "Email is required"
+	} else if len(strings.TrimSpace(su.Email)) > 254 || !rxEmail.MatchString(su.Email) {
+		su.Failures["Email"] = "Email is not valid"
+	}
+
+	if len(strings.TrimSpace(su.Password)) == 0 {
+		su.Failures["Password"] = "Password is required"
+	} else if utf8.RuneCountInString(su.Password) < 8 {
+		su.Failures["Password"] = "Password is too short"
+	}
+
+	return len(su.Failures) == 0
 }
