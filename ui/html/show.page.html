@@ -1,21 +1,24 @@
 {{define "page-title"}}Snippet #{{.Snippet.ID}}{{end}}
 
 {{define "page-body"}}
-<div class="snippet">
+    {{with .Flash}}
+    <div class="flash">{{.}}</div>
+    {{end}}
     {{with .Snippet}}
-    <div class="metadata">
-        <strong>{{.Title}}</strong>
-        <span>#{{.ID}}</span>
-    </div>
-    <pre><code>{{.Content}}</code></pre>
-    <div class="metadata">
-        <time>{{.Created | humanDate | printf "Created: %s"}}</time>
-        <time>{{.Expires | humanDate | printf "Expires: %s"}}</time>
+    <div class="snippet">
+        <div class="metadata">
+            <strong>{{.Title}}</strong>
+            <span>#{{.ID}}</span>
+        </div>
+        <pre><code>{{.Content}}</code></pre>
+        <div class="metadata">
+            <time>{{.Created | humanDate | printf "Created: %s"}}</time>
+            <time>{{.Expires | humanDate | printf "Expires: %s"}}</time>
+        </div>
     </div>
     {{else}}
     No snippets to display!
     {{end}}
-</div>
 {{- end}}
 
 {{define "page-footer"}}

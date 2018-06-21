@@ -40,7 +40,17 @@ func (app *App) ShowSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.RenderHtml(w, r, "show.page.html", &HtmlData{Snippet: snippet})
+	session := app.sessions.Load(r)
+	flash, err := session.PopString(w, "flash")
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	app.RenderHtml(w, r, "show.page.html", &HtmlData{
+		Snippet: snippet,
+		Flash:   flash,
+	})
 }
 
 func (app *App) NewSnippet(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +80,13 @@ func (app *App) CreateSnippet(w http.ResponseWriter, r *http.Request) {
 	formatDate := fmt.Sprintf("+%s.0 seconds", form.Expires)
 
 	id, err := app.database.InsertSnippet(form.Title, form.Content, formatDate)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	session := app.sessions.Load(r)
+	err = session.PutString(w, "flash", "Snipped saved succesfully")
 	if err != nil {
 		app.ServerError(w, err)
 		return
