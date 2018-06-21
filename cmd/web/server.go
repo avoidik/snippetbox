@@ -91,12 +91,13 @@ func (app *App) InitServer() {
 	}
 
 	app.server = &http.Server{
-		Addr:         app.addr,
-		Handler:      app.Routes(),
-		WriteTimeout: 30 * time.Second,
-		ReadTimeout:  15 * time.Second,
-		IdleTimeout:  60 * time.Second,
-		TLSConfig:    tlsConfig,
+		Addr:           app.addr,
+		Handler:        app.Routes(),
+		WriteTimeout:   30 * time.Second,
+		ReadTimeout:    15 * time.Second,
+		IdleTimeout:    60 * time.Second,
+		TLSConfig:      tlsConfig,
+		MaxHeaderBytes: 524288,
 	}
 }
 
