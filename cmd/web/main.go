@@ -33,6 +33,8 @@ func main() {
 	flag.StringVar(&app.htmlDir, "html-dir", "./ui/html", "Path to html templates")
 	flag.StringVar(&app.databaseFile, "db-file", "./info.db", "Path to database file")
 	flag.StringVar(&app.secret, "secret", "8sB9ozuKkqWtN3b6lEiInd1dSISxPWogpaGV5HG4wKs=", "Secret key for cookies encryption")
+	tlsCert := flag.String("tls-cert", "./tls/cert.pem", "TLS certificate")
+	tlsKey := flag.String("tls-key", "./tls/key.pem", "TLS private-key")
 	flag.Parse()
 
 	if !existDir(app.staticDir) {
@@ -41,6 +43,14 @@ func main() {
 
 	if !existDir(app.htmlDir) {
 		log.Fatal("Folder for html-dir was not found")
+	}
+
+	if !existDir(*tlsCert) {
+		log.Fatal("TLS certificate was not found")
+	}
+
+	if !existDir(*tlsKey) {
+		log.Fatal("TLS key was not found")
 	}
 
 	if err := app.connectDb(); err != nil {
@@ -54,7 +64,7 @@ func main() {
 	sessionManager := scs.NewCookieManager(app.secret)
 	sessionManager.Lifetime(12 * time.Hour)
 	sessionManager.Persist(true)
-
+	sessionManager.Secure(true)
 	app.sessions = sessionManager
 
 	server := &http.Server{
@@ -81,7 +91,7 @@ func main() {
 
 	log.Printf("Listening on %s\n", app.addr)
 
-	if err := server.ListenAndServe(); err != nil {
+	if err := server.ListenAndServeTLS(*tlsCert, *tlsKey); err != nil {
 		if err != http.ErrServerClosed {
 			log.Println("The error below raised after shutdown:")
 			log.Println(err)
