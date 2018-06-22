@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"snippetbox.org/pkg/forms"
+	"snippetbox.org/pkg/models"
 )
 
 func (app *App) Home(w http.ResponseWriter, r *http.Request) {
@@ -138,7 +139,25 @@ func (app *App) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "CreateUser")
+	err = app.database.InsertUser(form.Name, form.Email, form.Password)
+	if err == models.ErrDuplicateEmail {
+		form.Failures["Email"] = "Email already in use"
+		app.RenderHtml(w, r, "signup.page.html", &HtmlData{Form: form})
+		return
+	} else if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	msg := "Your signup was successful. Please log in using your credentials."
+	session := app.sessions.Load(r)
+	err = session.PutString(w, "flash", msg)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
 func (app *App) LoginUser(w http.ResponseWriter, r *http.Request) {

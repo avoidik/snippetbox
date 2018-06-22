@@ -2,11 +2,17 @@ package models
 
 import (
 	"database/sql"
+	"errors"
+
+	"github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Database struct {
 	*sql.DB
 }
+
+var ErrDuplicateEmail = errors.New("models: email address already in use")
 
 func (db *Database) GetSnippet(id int) (*Snippet, error) {
 	stmt := `SELECT id, title, content, created, expires FROM snippets
@@ -127,4 +133,23 @@ func (db *Database) InitializeDb() error {
 	}
 
 	return nil
+}
+
+func (db *Database) InsertUser(name, email, password string) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	if err != nil {
+		return err
+	}
+
+	stmt := `INSERT INTO users (name, email, password, created)
+	VALUES (?, ?, ?, datetime('now'))`
+
+	_, err = db.Exec(stmt, name, email, string(hashedPassword))
+	if err != nil {
+		dbErr := err.(sqlite3.Error)
+		if dbErr.Code == sqlite3.ErrConstraint && dbErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+			return ErrDuplicateEmail
+		}
+	}
+	return err
 }
