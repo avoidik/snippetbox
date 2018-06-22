@@ -212,5 +212,11 @@ func (app *App) VerifyUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) LogoutUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "LogoutUser")
+	session := app.sessions.Load(r)
+	err := session.Remove(w, "currentUserId")
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
