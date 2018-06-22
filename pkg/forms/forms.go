@@ -22,6 +22,12 @@ type SignupUser struct {
 	Failures map[string]string
 }
 
+type LoginUser struct {
+	Email    string
+	Password string
+	Failures map[string]string
+}
+
 func (ns *NewSnippet) Valid() bool {
 	ns.Failures = make(map[string]string)
 
@@ -67,4 +73,22 @@ func (su *SignupUser) Valid() bool {
 	}
 
 	return len(su.Failures) == 0
+}
+
+func (lu *LoginUser) Valid() bool {
+	lu.Failures = make(map[string]string)
+
+	if len(strings.TrimSpace(lu.Email)) == 0 {
+		lu.Failures["Email"] = "Email is required"
+	} else if len(strings.TrimSpace(lu.Email)) > 254 || !rxEmail.MatchString(lu.Email) {
+		lu.Failures["Email"] = "Email is not valid"
+	}
+
+	if len(strings.TrimSpace(lu.Password)) == 0 {
+		lu.Failures["Password"] = "Password is required"
+	} else if utf8.RuneCountInString(lu.Password) < 8 {
+		lu.Failures["Password"] = "Password is too short"
+	}
+
+	return len(lu.Failures) == 0
 }

@@ -12,7 +12,10 @@ type Database struct {
 	*sql.DB
 }
 
-var ErrDuplicateEmail = errors.New("models: email address already in use")
+var (
+	ErrDuplicateEmail     = errors.New("models: email address already in use")
+	ErrInvalidCredentials = errors.New("models: invalid credentials")
+)
 
 func (db *Database) GetSnippet(id int) (*Snippet, error) {
 	stmt := `SELECT id, title, content, created, expires FROM snippets
@@ -152,4 +155,28 @@ func (db *Database) InsertUser(name, email, password string) error {
 		}
 	}
 	return err
+}
+
+func (db *Database) VerifyUser(email, password string) (int, error) {
+	stmt := `SELECT id, password FROM users
+	WHERE email = ?`
+
+	var id int
+	var hashedPassword []byte
+	row := db.QueryRow(stmt, email)
+	err := row.Scan(&id, &hashedPassword)
+	if err == sql.ErrNoRows {
+		return 0, ErrInvalidCredentials
+	} else if err != nil {
+		return 0, err
+	}
+
+	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return 0, ErrInvalidCredentials
+	} else if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }

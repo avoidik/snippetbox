@@ -161,11 +161,54 @@ func (app *App) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) LoginUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "LoginUser")
+	session := app.sessions.Load(r)
+	flash, err := session.PopString(w, "flash")
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	app.RenderHtml(w, r, "login.page.html", &HtmlData{
+		Form:  &forms.LoginUser{},
+		Flash: flash,
+	})
 }
 
 func (app *App) VerifyUser(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "VerifyUser")
+	err := r.ParseForm()
+	if err != nil {
+		app.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	form := &forms.LoginUser{
+		Email:    r.PostForm.Get("email"),
+		Password: r.PostForm.Get("password"),
+	}
+
+	if !form.Valid() {
+		app.RenderHtml(w, r, "login.page.html", &HtmlData{Form: form})
+		return
+	}
+
+	currentUserId, err := app.database.VerifyUser(form.Email, form.Password)
+	if err == models.ErrInvalidCredentials {
+		form.Failures["Generic"] = "Email or Password incorret"
+		app.RenderHtml(w, r, "login.page.html", &HtmlData{Form: form})
+		return
+	} else if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	session := app.sessions.Load(r)
+	err = session.PutInt(w, "currentUserId", currentUserId)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/snippet/new", http.StatusSeeOther)
 }
 
 func (app *App) LogoutUser(w http.ResponseWriter, r *http.Request) {
