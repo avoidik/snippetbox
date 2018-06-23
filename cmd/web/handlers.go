@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	"snippetbox.org/pkg/forms"
 	"snippetbox.org/pkg/models"
@@ -103,16 +102,6 @@ func (app *App) VersionInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.ServeFile(w, r, verFile)
-}
-
-func DisableIndex(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasSuffix(r.URL.Path, "/") {
-			http.Error(w, "Nothing to see here", http.StatusNotFound)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
 }
 
 func (app *App) SignupUser(w http.ResponseWriter, r *http.Request) {

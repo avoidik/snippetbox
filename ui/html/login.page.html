@@ -5,6 +5,7 @@
     <div class="flash">{{.}}</div>
     {{end}}
     <form action="/user/login" method="POST" novalidate>
+        <input type="hidden" name="csrf_token" value="{{.CSRFtoken}}">
         {{with .Form}}
             {{with .Failures.Generic}}
             <div class="error">{{.}}</div>
@@ -23,7 +24,7 @@
                 {{end}}
                 <input type="password" name="password">
             </div>
-            <div>
+            <div>                
                 <input type="submit" value="Submit">
             </div>
         {{end}}

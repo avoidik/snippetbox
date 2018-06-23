@@ -2,6 +2,7 @@
 
 {{define "page-body"}}
 <form action="/user/signup" method="POST" novalidate>
+    <input type="hidden" name="csrf_token" value="{{.CSRFtoken}}">
     {{with .Form}}
         <div>
             <label>Name:</label>

@@ -1,5 +1,5 @@
-hash: b0d7c8e5b8f72fa0c05b9059842df7d12cfc534c69b896e9beffe9279a3df468
-updated: 2018-06-21T22:40:07.2391184+03:00
+hash: 2c21ad9c4c95ae884d3f90dca9be9d3d866ddbe0eb4780be104505baae03af92
+updated: 2018-06-22T23:51:18.34416+03:00
 imports:
 - name: github.com/alexedwards/scs
   version: a01923edcb7f83c0c6ae7e70ad03f293e6ec9e26
@@ -9,12 +9,15 @@ imports:
   version: 6226ea591a40176dd3ff9cd8eff81ed6ca721a00
 - name: github.com/justinas/alice
   version: 03f45bd4b7dad4734bc4620e46a35789349abb20
+- name: github.com/justinas/nosurf
+  version: 7182011986c42c33f0a79fd4b07e41edc784532b
 - name: github.com/mattn/go-sqlite3
   version: 25ecb14adfc7543176f7d85291ec7dba82c6f7e4
 - name: golang.org/x/crypto
   version: a49355c7e3f8fe157a85be2f77e6e269a0f89602
   subpackages:
   - bcrypt
+  - blowfish
   - internal/subtle
   - nacl/secretbox
   - poly1305

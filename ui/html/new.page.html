@@ -2,6 +2,7 @@
 
 {{define "page-body"}}
 <form action="/snippet/new" method="POST">
+    <input type="hidden" name="csrf_token" value="{{.CSRFtoken}}">
     {{with .Form}}
     <div>
         <label>Title:</label>

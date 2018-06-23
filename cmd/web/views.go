@@ -7,16 +7,18 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/justinas/nosurf"
 	"snippetbox.org/pkg/models"
 )
 
 type HtmlData struct {
-	Form     interface{}
-	Path     string
-	Flash    string
-	LoggedIn bool
-	Snippet  *models.Snippet
-	Snippets []*models.Snippet
+	CSRFtoken string
+	Form      interface{}
+	Path      string
+	Flash     string
+	LoggedIn  bool
+	Snippet   *models.Snippet
+	Snippets  []*models.Snippet
 }
 
 func humanDate(t time.Time) string {
@@ -29,6 +31,8 @@ func (app *App) RenderHtml(w http.ResponseWriter, r *http.Request, page string, 
 	}
 
 	data.Path = r.URL.Path
+
+	data.CSRFtoken = nosurf.Token(r)
 
 	var err error
 	data.LoggedIn, err = app.LoggedIn(r)
