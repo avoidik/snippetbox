@@ -3,20 +3,12 @@ package main
 import (
 	"flag"
 	"log"
-	"os"
 	"time"
 
 	"github.com/alexedwards/scs"
 
 	_ "github.com/mattn/go-sqlite3"
 )
-
-func existDir(path *string) bool {
-	if _, err := os.Stat(*path); os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
 
 func main() {
 	log.Println("Starting the server...")

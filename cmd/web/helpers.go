@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"net/http"
+	"os"
+)
 
 func (app *App) LoggedIn(r *http.Request) (bool, error) {
 	session := app.sessions.Load(r)
@@ -9,4 +12,11 @@ func (app *App) LoggedIn(r *http.Request) (bool, error) {
 		return false, err
 	}
 	return loggedIn, nil
+}
+
+func existDir(path *string) bool {
+	if _, err := os.Stat(*path); os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
