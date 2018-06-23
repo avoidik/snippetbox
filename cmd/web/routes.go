@@ -22,10 +22,10 @@ func (app *App) Routes() http.Handler {
 	mux.Post("/user/login", alice.New(NoSurf).Then(http.HandlerFunc(app.VerifyUser)))
 	mux.Post("/user/logout", alice.New(app.RequireLogin, NoSurf).Then(http.HandlerFunc(app.LogoutUser)))
 
+	mux.Get("/version", http.HandlerFunc(app.VersionInfo))
+
 	fileServer := http.FileServer(http.Dir(app.staticDir))
 	mux.Get("/static/", alice.New(StripStatic, DisableIndex).Then(fileServer))
-
-	mux.Get("/version", http.HandlerFunc(app.VersionInfo))
 
 	return alice.New(LogRequest, SecureHeaders).Then(mux)
 }
